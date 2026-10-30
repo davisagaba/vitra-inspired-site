@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saved Items | Your Brand</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="main-nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">YOUR BRAND</a>
+      <ul class="nav-links">
+        <li class="has-megamenu"><a href="#" class="megamenu-trigger">Products</a>
+          <div class="megamenu">
+            <div class="megamenu-col">
+              <h4>Bathroom</h4>
+              <a href="products.html#toilets">Toilets</a>
+              <a href="products.html#washbasins">Washbasins</a>
+              <a href="products.html#furniture">Furniture</a>
+              <a href="products.html#taps">Taps</a>
+              <a href="products.html#showers">Shower Systems</a>
+              <a href="products.html#accessories">Accessories</a>
+            </div>
+            <div class="megamenu-col">
+              <h4>Tiles</h4>
+              <a href="products.html#tiles">Wall Tiles</a>
+              <a href="products.html#tiles">Floor Tiles</a>
+              <a href="products.html#tiles">Mosaics</a>
+            </div>
+            <div class="megamenu-feature">
+              <img src="https://images.pexels.com/photos/7031865/pexels-photo-7031865.jpeg?auto=compress&cs=tinysrgb&w=500" alt="Featured bathroom look">
+              <a href="products.html" class="megamenu-feature-link">View All Products →</a>
+            </div>
+          </div>
+        </li>
+        <li><a href="ideas.html">Ideas</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="professionals.html">Professionals</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="favorites.html" class="nav-favorites" aria-label="Favorites">♥ <span class="favorites-count" hidden>0</span></a>
+        <button class="nav-search" aria-label="Search">🔍</button>
+        <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+      <div class="search-panel">
+        <input type="text" class="search-input" placeholder="Search products (min. 3 characters)">
+        <div class="search-results"></div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <h1>Saved Items</h1>
+    <p>Products you've added to your favorites.</p>
+  </div>
+</section>
+
+<section class="anchor-section">
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><span class="current">Saved Items</span></nav>
+    <div class="product-grid" id="favorites-grid"></div>
+    <p class="centered-note" id="favorites-empty" hidden>You haven't saved any products yet. Browse the <a href="products.html">full range</a> and tap the heart icon on anything you like.</p>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="about.html">About Us</a>
+      <a href="about.html#investors">Investor Relations</a>
+      <a href="about.html#careers">Careers</a>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <a href="products.html#toilets">Bathroom</a>
+      <a href="products.html#tiles">Tiles</a>
+      <a href="professionals.html#brochures">Brochures</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="services.html#faq">FAQ</a>
+      <a href="services.html#contact">Contact Us</a>
+      <a href="services.html#showroom">Find a Showroom</a>
+    </div>
+    <div class="footer-col">
+      <h4>Follow Us</h4>
+      <div class="social-links">
+        <a href="#">LinkedIn</a>
+        <a href="#">Instagram</a>
+        <a href="#">YouTube</a>
+        <a href="#">Pinterest</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <p>&copy; 2026 Your Brand. All rights reserved.</p>
+      <div class="footer-legal-links">
+        <a href="about.html#privacy">Privacy Policy</a>
+        <a href="about.html#quality">Quality Policy</a>
+        <a href="about.html#investors">Investor Relations</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="catalog.js"></script>
+<script src="shop.js"></script>
+<script src="script.js"></script>
+<script>
+  function renderFavorites() {
+    const ids = getFavorites();
+    const grid = document.getElementById('favorites-grid');
+    const empty = document.getElementById('favorites-empty');
+    const items = ids.map((id) => getProductById(id)).filter(Boolean);
+
+    if (items.length === 0) {
+      grid.innerHTML = '';
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+    grid.innerHTML = items
+      .map((p) => {
+        const img = getProductImages(p, 400)[0];
+        return `
+        <article class="product-card">
+          <div class="product-image">
+            <img src="${img}" alt="${p.name}" loading="lazy">
+            <button type="button" class="favorite-btn favorite-active" data-id="${p.id}" aria-pressed="true" aria-label="Remove from favorites">♥</button>
+            ${!p.stock ? '<span class="stock-badge">Out of Stock</span>' : ""}
+          </div>
+          <p class="product-code">${p.code}</p>
+          <h3><a href="product-detail.html?id=${p.id}">${p.name}</a></h3>
+          <p class="product-price">${formatPrice(p.price)}</p>
+          <a href="product-detail.html?id=${p.id}" class="btn-outline small">View Item</a>
+        </article>`;
+      })
+      .join('');
+
+    grid.querySelectorAll('.favorite-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        toggleFavorite(btn.dataset.id);
+        renderFavorites();
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded', renderFavorites);
+</script>
+</body>
+</html>
